@@ -13,7 +13,7 @@
 #'     geom_point()
 #' umap_arrows(p)
 
-umap_arrows <- function(plot, percentage = 0.2, label_x = "UMAP 1", label_y = "UMAP 2", x_pad = 0.5, y_pad = 0.5) {
+umap_arrows <- function(plot, percentage = 0.2, label_x = "UMAP 1", label_y = "UMAP 2", x_pad = 0.2, y_pad = 0.2) {
     xrange <- layer_scales(plot)$x$range$range
     yrange <- layer_scales(plot)$y$range$range
 
@@ -43,7 +43,7 @@ umap_arrows <- function(plot, percentage = 0.2, label_x = "UMAP 1", label_y = "U
             "text",
             x = xstart + x_wid / 2,
             y = ystart - y_pad,
-            label = "label_x",
+            label = label_x,
             size = 3,
             vjust = 0.5,
             hjust = 0.5
@@ -52,7 +52,7 @@ umap_arrows <- function(plot, percentage = 0.2, label_x = "UMAP 1", label_y = "U
             "text",
             x = xstart - x_pad,
             y = ystart + y_wid / 2,
-            label = "label_y",
+            label = label_y,
             angle = 90,
             size = 3,
             vjust = 0.5,
