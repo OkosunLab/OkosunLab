@@ -9,8 +9,8 @@ umap_arrows(
   percentage = 0.2,
   label_x = "UMAP 1",
   label_y = "UMAP 2",
-  x_pad = 0.5,
-  y_pad = 0.5
+  x_pad = 0.2,
+  y_pad = 0.2
 )
 }
 \arguments{
