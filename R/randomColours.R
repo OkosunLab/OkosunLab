@@ -1,5 +1,6 @@
 #' A function to randomly select n colours and plot them.
 #' Useful if you're stuck thinking of a palette
+#'
 #' @title randomColours
 #' @param number number of colours to pick
 #' @param height number of rows for plot
