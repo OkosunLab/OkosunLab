@@ -13,7 +13,7 @@
 #' TPM(matrix, lengths)
 #'
 
-TPM <- function(matrix, length, log = TRUE, pseudocount = TRUE) {
+TPM <- function(matrix, length, log = FALSE, pseudocount = FALSE) {
     ## You can't log with zeroes so if you have zeroes you can add a pseudocount of 1 here
     if ( pseudocount ) {
         matrix <- matrix + 1
@@ -28,6 +28,7 @@ TPM <- function(matrix, length, log = TRUE, pseudocount = TRUE) {
     ## returns feature as column and sample as row so transpose
     tpm <- t(tpm)
     if (log) {
-        log2(tpm)
+        tpm <- log2(tpm)
     }
+    tpm
 }
