@@ -4,7 +4,7 @@
 \alias{TPM}
 \title{TPM}
 \usage{
-TPM(matrix, length, log = TRUE, pseudocount = TRUE)
+TPM(matrix, length, log = FALSE, pseudocount = FALSE)
 }
 \arguments{
 \item{matrix}{a matrix of counts, rows for features and columns for samples}
