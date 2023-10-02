@@ -22,10 +22,10 @@ FancyUmap <- function(seuratObj,
                       split = NULL) {
     if (is.null(split)) {
         umap <- DimPlot(seuratObj,
-                        reduction = "umap", group.by = group)
+                        reduction = reduction, group.by = group)
     } else {
         umap <- DimPlot(seuratObj,
-                        reduction = "umap",
+                        reduction = reduction,
                         group.by = group,
                         split.by = split)
     }
