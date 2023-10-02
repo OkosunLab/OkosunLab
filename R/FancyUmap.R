@@ -1,4 +1,4 @@
-#' @title umap_arrows
+#' @title FancyUmap
 #' @param seuratObj a seurat object
 #' @param reduction the reduction to use for the Dimplot (default: umap)
 #' @param group the column in the metadata to colour the cells by (default: orig.ident)
