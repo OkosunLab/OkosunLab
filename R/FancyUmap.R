@@ -1,71 +1,115 @@
-#' @title FancyUmap
+#' @title FancyUmapPlot
 #' @param seuratObj a seurat object
-#' @param reduction the reduction to use for the Dimplot (default: umap)
-#' @param group the column in the metadata to colour the cells by (default: orig.ident)
 #' @param title a title for the plot, if NULL a generic title will be added (default: NULL)
 #' @param subtitle a subtitle for the plot, if NULL a generic subtitle will be added (default: NULL)
-#' @param split a column in the metadata to split the umap into multiple umaps (default: NULL) N.B. this will break the arrows!
+#' @param ... Any other arguments that will be passed onto dimplot
 #' @return a ggplot object
 #' @keywords UMAP dimplot
 #' @export
 #' @examples
 #'
-#' FancyUmap(seuratObj, reduction = "umap", group = "seurat_clusters", title = "test plot", subtitle = "a plot to test this function", split = NULL)
+#' FancyUmapPlot(seuratObj)
+#'
+#' FancyUmapPlot(seuratObj, title = "test plot", subtitle = "a plot to test this function")
 #'
 
-
-FancyUmap <- function(seuratObj,
-                      reduction = "umap",
-                      group = "orig.ident",
-                      title = NULL,
-                      subtitle = NULL,
-                      split = NULL) {
-    if (is.null(split)) {
-        umap <- DimPlot(seuratObj,
-                        reduction = reduction, group.by = group)
-    } else {
-        umap <- DimPlot(seuratObj,
-                        reduction = reduction,
-                        group.by = group,
-                        split.by = split)
-    }
-    if (is.null(title)) {
-        umap <- umap +
-            labs(title = paste("A", reduction, "plot"))
-    } else {
-        umap <- umap +
-            labs(title = title)
-    }
-    if (is.null(subtitle)) {
-        umap <- umap +
-            labs(subtitle = paste("Cells coloured by", group))
-    } else {
-        umap <- umap +
-            labs(subtitle = subtitle)
-    }
-    ## Completely remove axes
-    umap +
-        theme(
+FancyUmapPlot <-
+    function (seuratObj,
+              title = NULL,
+              subtitle = NULL,
+              ...) {
+        umap <- Seurat::DimPlot(seuratObj, ...)
+        if (! is.null(title)) {
+            umap <- umap + labs(title = title)
+        }
+        if (! is.null(subtitle)) {
+            umap <- umap + labs(subtitle = subtitle)
+        }
+        umap + theme(
             axis.line = element_line(arrow = arrow(
-                length = unit(5, "pt"),
-                type = "closed"
+                length = unit(5,
+                              "pt"), type = "closed"
             )),
             axis.text = element_blank(),
             axis.title = element_text(hjust = 0),
             axis.ticks = element_blank()
         ) +
-        ## Use ggh4x's truncated axis to plot only 60pt axes
-        guides(
-            x = ggh4x::guide_axis_truncated(
-                trunc_lower = unit(0, "npc"),
-                trunc_upper = unit(60, "pt")
-            ),
-            y = ggh4x::guide_axis_truncated(
-                trunc_lower = unit(0, "npc"),
-                trunc_upper = unit(60, "pt")
-            )
-        ) +
-        labs(caption = paste("n =",
-                             nrow(seuratObj@meta.data),
-                             "cells"))
+            guides(
+                x = ggh4x::guide_axis_truncated(
+                    trunc_lower = unit(0,
+                                       "npc"),
+                    trunc_upper = unit(60, "pt")
+                ),
+                y = ggh4x::guide_axis_truncated(
+                    trunc_lower = unit(0,
+                                       "npc"),
+                    trunc_upper = unit(60, "pt")
+                )
+            ) + labs(caption = paste("n =",
+                                     nrow(seuratObj@meta.data), "cells"))
+    }
+
+#' @title FancyUmap
+#' @param seuratObj a seurat object
+#' @param split.by if Null proceed as normal (default). If set it will standardise the colours across the plots.
+#' @param ... Any other arguments that will be passed onto dimplot
+#' @return a ggplot object
+#' @keywords UMAP dimplot
+#' @export
+#' @examples
+#'
+#' FancyUmapPlot(seuratObj)
+#'
+#' FancyUmapPlot(seuratObj, title = "test plot", subtitle = "a plot to test this function")
+#'
+
+FancyUmap <- function(seuratObj,
+                      split.by = NULL,
+                      ...) {
+    if (is.null(split.by)) {
+        umap <- FancyUmapPlot(seuratObj, ...)
+    } else {
+        args <- list(...)
+        if (! "reduction" %in% names(args)) {
+            reduction = "umap"
+        } else {
+            reduction = args$reduction
+        }
+        xlim <- Embeddings(seuratObj, reduction = reduction)[,1]
+        ylim <- Embeddings(seuratObj, reduction = reduction)[,2]
+        if ("cols" %in% names(args)) {
+            umap <- lapply(unlist(unique(seuratObj[[split.by]])), function(split) {
+                cells = colnames(seuratObj[,seuratObj[[split.by]] == split])
+                FancyUmapPlot(seuratObj[,cells], ...) +
+                    lims(x = c(floor(min(xlim)), ceiling(max(xlim))),
+                         y = c(floor(min(ylim)), ceiling(max(ylim))))
+            }) }
+        else {
+            if (! "group.by" %in% names(args)){
+                groups = unlist(unique(seuratObj@active.ident))
+            } else {
+                groups = unlist(unique(seuratObj[[args$group.by]]))
+            }
+            ## If you don't specific the colours you will add NAs here which will get a colour
+            ## Remove them here
+            groups <- groups[!is.na(groups)]
+            if (! "na.value" %in% names(args)) {
+                na.value = "gray50"
+            } else {
+                na.value = args$na.value
+            }
+            colours <- scales::hue_pal()(length(groups)) %>%
+                setNames(groups)
+            umap <- lapply(unlist(unique(seuratObj[[split.by]])), function(split) {
+                cells = colnames(seuratObj[,seuratObj[[split.by]] == split])
+                FancyUmapPlot(seuratObj[,cells], ...) +
+                    lims(x = c(floor(min(xlim)), ceiling(max(xlim))),
+                         y = c(floor(min(ylim)), ceiling(max(ylim)))) +
+                    scale_colour_manual(values = colours,
+                                        drop = FALSE,
+                                        na.value = na.value)
+            })}
+        umap <- umap %>% patchwork::wrap_plots()
+    }
+    umap
 }

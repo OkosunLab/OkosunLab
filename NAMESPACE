@@ -2,6 +2,7 @@
 
 export(CPM)
 export(FancyUmap)
+export(FancyUmapPlot)
 export(TPM)
 export(randomColours)
 export(umap_arrows)
