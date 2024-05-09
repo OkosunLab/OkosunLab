@@ -58,7 +58,7 @@ PlotSeuratQCFromList <- function(seuratList) {
     ## These are the cut offs I plan to use below
     MetricCuttofs <-
         data.frame(
-            Metrics = metrics,
+            Metrics = c("log10nCount_RNA", "log10nFeature_RNA", "log10GenesPerUMI", "mitoRatio"),
             Cutoffs = c(log10(200), log10(200), 0.8, 0.1)
         )
     combined.meta.data %>%
