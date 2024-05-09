@@ -58,7 +58,7 @@ PlotSeuratQCFromList <- function(seuratList) {
     ## These are the cut offs I plan to use below
     MetricCuttofs <-
         data.frame(
-            Metrics = c("log10nCount_RNA", "log10nFeature_RNA", "log10GenesPerUMI", "mitoRatio"),
+            Metrics = metrics,
             Cutoffs = c(log10(200), log10(200), 0.8, 0.1)
         )
     combined.meta.data %>%
@@ -74,10 +74,10 @@ PlotSeuratQCFromList <- function(seuratList) {
             values_to = "Value"
         ) %>%
         ggplot(aes(x = Value,
-                   y = interaction(Patient, tissue, sep = "&"),
+                   y = interaction(Patient, Tissue, sep = "&"),
                    fill = Patient)) +
         ggridges::geom_density_ridges(alpha = 0.5) +
-        facet_grid(sort ~
+        facet_grid(Sort ~
                        fct_relevel(Metrics,
                                    c(
                                        "log10nCount_RNA",
